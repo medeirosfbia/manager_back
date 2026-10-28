@@ -1,7 +1,4 @@
 spring:
-  rabbitmq:
-    addresses: amqps://voujkfip:75DMzZg-cbMwUd4rZqu_-J0pVfrtNJq_@shrimp.rmq.cloudamqp.com/voujkfip
-    queue: cylon
   jpa:
     generate-ddl: true
     database: postgresql
