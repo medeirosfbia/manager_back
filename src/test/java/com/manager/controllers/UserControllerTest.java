@@ -1,6 +1,7 @@
 package com.manager.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.manager.models.Role;
 import com.manager.models.User;
 import com.manager.models.UserLogin;
 import com.manager.repositories.UserRepository;
@@ -9,6 +10,7 @@ import com.manager.security.JwtService;
 import com.manager.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -75,6 +77,25 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testSignupIgnoresRoleFromRequestBody() throws Exception {
+        Mockito.when(userService.create(any(User.class)))
+                .thenReturn(Optional.of(user));
+
+        String body = "{\"username\":\"hacker\",\"email\":\"h@email.com\",\"name\":\"H\","
+                + "\"lastname\":\"H\",\"password\":\"1234\",\"birthday\":\"2000-01-01\","
+                + "\"role\":\"ADMIN\"}";
+
+        mockMvc.perform(post("/user/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk());
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        Mockito.verify(userService).create(captor.capture());
+        org.junit.jupiter.api.Assertions.assertEquals(Role.USER, captor.getValue().getRole());
     }
 
     @Test

@@ -20,5 +20,6 @@ public class UserLogin {
     private String email;
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date birthday;
+    private Role role;
 
 }

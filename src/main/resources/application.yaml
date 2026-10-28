@@ -32,3 +32,10 @@ server:
 security:
   jwt:
     secret: ${JWT_SECRET_B64}
+
+# Admin criado pelo AdminSeeder na inicialização (só se ADMIN_PASSWORD estiver definido)
+admin:
+  default:
+    username: ${ADMIN_USERNAME:admin}
+    email: ${ADMIN_EMAIL:admin@aprovia.com}
+    password: ${ADMIN_PASSWORD:}

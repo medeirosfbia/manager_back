@@ -1,5 +1,6 @@
 package com.manager.services;
 
+import com.manager.models.Role;
 import com.manager.models.User;
 import com.manager.models.UserLogin;
 import com.manager.repositories.UserRepository;
@@ -36,18 +37,23 @@ public class UserService {
             throw new Exception();
         }else {
             user.setPassword(criptPassword(user.getPassword()));
+            // Cadastro público sempre cria usuário comum; admin só pelo AdminSeeder ou banco
+            user.setRole(Role.USER);
             return Optional.of(userRepository.save(user));
         }
     }
 
     public Optional<User> update(User user) {
-        if (userRepository.findById(user.getId()).isPresent()) {
+        Optional<User> existingUser = userRepository.findById(user.getId());
+        if (existingUser.isPresent()) {
             Optional<User> searchUsername = userRepository.findByUsername(user.getUsername());
 //            Optional<User> searchEmail = userRepository.findByEmail(user.getEmail());
             if ((searchUsername.isPresent()) && (searchUsername.get().getId() != user.getId())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Existented User!", null);
             }
             user.setPassword(criptPassword(user.getPassword()));
+            // O papel não vem no JSON; mantém o que está no banco
+            user.setRole(existingUser.get().getRole());
 
             return Optional.ofNullable(userRepository.save(user));
 
@@ -85,7 +91,8 @@ public class UserService {
                 userLogin.get().setId(user.get().getId());
                 userLogin.get().setName(user.get().getName());
                 userLogin.get().setPicture(user.get().getPicture());
-                userLogin.get().setToken(createToken(userLogin.get().getUsername()));
+                userLogin.get().setToken(createToken(user.get().getUsername(), user.get().getRole()));
+                userLogin.get().setRole(user.get().getRole());
                 userLogin.get().setEmail(user.get().getEmail());
                 userLogin.get().setLastname(user.get().getLastname());
                 userLogin.get().setBirthday(user.get().getBirthday());
@@ -103,8 +110,8 @@ public class UserService {
         return encoder.encode(password);
     }
 
-    private String createToken(String username) {
-        return "Bearer " + jwtService.generateToken(username);
+    private String createToken(String username, Role role) {
+        return "Bearer " + jwtService.generateToken(username, role);
     }
 
     public Optional<User> getById(Integer id) {

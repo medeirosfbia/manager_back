@@ -1,5 +1,6 @@
 package com.manager.security;
 
+import com.manager.models.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -65,8 +66,10 @@ public class JwtService {
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Role role) {
         Map<String, Object> claims = new HashMap<>();
+        // Lido pelo backend Python para liberar as rotas de admin
+        claims.put("role", role.name());
         return createToken(claims, username);
 
     }
