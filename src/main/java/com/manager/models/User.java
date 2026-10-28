@@ -30,7 +30,9 @@ public class User {
     private String name;
     @NotNull
     private String lastname;
+    // WRITE_ONLY: aceita a senha no JSON recebido, mas nunca devolve o hash
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @NotNull
     @JsonFormat(pattern="yyyy-MM-dd")

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -116,5 +117,23 @@ public class UserService {
 
     public Optional<User> getById(Integer id) {
         return userRepository.findById(id);
+    }
+
+    /** O usuário autenticado pode gerenciar a conta se for ela mesma ou se for ADMIN. */
+    public boolean canManage(Integer userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (userId == null || authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+        if (isAdmin) {
+            return true;
+        }
+
+        return userRepository.findByUsername(authentication.getName())
+                .map(currentUser -> userId.equals(currentUser.getId()))
+                .orElse(false);
     }
 }
