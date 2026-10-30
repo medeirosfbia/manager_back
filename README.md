@@ -55,7 +55,8 @@ manager_back/
   - Filtro JWT para proteger rotas
   - Configuração de CORS e CSRF
 - **Documentação**
-  - Swagger UI disponível em `/swagger-ui.html`
+  - Swagger UI disponível em `/swagger-ui.html` (página pública). Para testar as rotas, faça login em
+    `POST /user/login`, copie o `token` (já vem como `Bearer <JWT>`) e cole em **Authorize**
 
 ---
 ### Foto de perfil (Azure Blob)
