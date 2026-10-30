@@ -37,6 +37,8 @@ public class User {
     @NotNull
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date birthday;
+    // READ_ONLY: só muda pelos endpoints /user/{id}/picture; ignorado no signup/update
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String picture;
 
     // READ_ONLY: o papel aparece nas respostas, mas é ignorado no JSON recebido

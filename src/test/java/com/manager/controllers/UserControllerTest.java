@@ -8,6 +8,7 @@ import com.manager.models.UserLogin;
 import com.manager.repositories.UserRepository;
 import com.manager.security.JwtAuthFilter;
 import com.manager.security.JwtService;
+import com.manager.services.ProfilePictureService;
 import com.manager.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,9 @@ public class UserControllerTest {
 
     @MockBean
     private JwtAuthFilter jwtAuthFilter;
+
+    @MockBean
+    private ProfilePictureService profilePictureService;
 
 
     private User user;
@@ -108,6 +112,25 @@ public class UserControllerTest {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         Mockito.verify(userService).create(captor.capture());
         assertEquals(Role.USER, captor.getValue().getRole());
+    }
+
+    @Test
+    void testSignupIgnoresPictureFromRequestBody() throws Exception {
+        Mockito.when(userService.create(any(User.class)))
+                .thenReturn(Optional.of(user));
+
+        String body = "{\"username\":\"aluno\",\"email\":\"a@email.com\",\"name\":\"A\","
+                + "\"lastname\":\"A\",\"password\":\"1234\",\"birthday\":\"2000-01-01\","
+                + "\"picture\":\"2-0123456789abcdef0123456789abcdef.png\"}";
+
+        mockMvc.perform(post("/user/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk());
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        Mockito.verify(userService).create(captor.capture());
+        assertEquals(null, captor.getValue().getPicture());
     }
 
     @Test

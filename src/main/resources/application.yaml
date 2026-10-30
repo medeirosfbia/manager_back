@@ -9,6 +9,11 @@ spring:
     url: jdbc:postgresql://${POSTGRESHOST}:${POSTGRESPORT}/${POSTGRESDATABASE}
     username: ${POSTGRESUSER}
     password: ${POSTGRESPASSWORD}
+  servlet:
+    multipart:
+      # Fotos de perfil: o serviço também recusa acima de 5 MB
+      max-file-size: 5MB
+      max-request-size: 6MB
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Brazil/East
@@ -36,3 +41,9 @@ admin:
     username: ${ADMIN_USERNAME:admin}
     email: ${ADMIN_EMAIL:admin@aprovia.com}
     password: ${ADMIN_PASSWORD:}
+
+# Fotos de perfil no Azure Blob. Sem a connection string, as rotas de upload respondem 503.
+azure:
+  storage:
+    connection-string: ${AZURE_STORAGE_CONNECTION_STRING:}
+    profile-pictures-container: ${PROFILE_PICTURES_CONTAINER:aprovia-profile-pictures}

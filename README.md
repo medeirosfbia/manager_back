@@ -58,6 +58,30 @@ manager_back/
   - Swagger UI disponível em `/swagger-ui.html`
 
 ---
+### Foto de perfil (Azure Blob)
+
+As fotos ficam no container `PROFILE_PICTURES_CONTAINER` (padrão `aprovia-profile-pictures`),
+privado e criado no primeiro uso. Configure `AZURE_STORAGE_CONNECTION_STRING` no `.env`; sem ela,
+o upload responde 503 e o resto da API funciona normalmente.
+
+Todas as rotas exigem o token e só funcionam para o próprio usuário (ou um ADMIN); para outro id → 403.
+
+- `GET /user/{id}/picture` — devolve a foto, ou a imagem padrão se o usuário estiver sem foto.
+  Como exige o header `Authorization`, o front não usa a rota direto em `<img src>`: no React Native,
+  `<Image source={{ uri, headers: { Authorization } }} />`; na web, `fetch` + `URL.createObjectURL`.
+  Responde com `ETag`; reenviando-o em `If-None-Match`, volta 304 enquanto a foto não mudar.
+- `PUT /user/{id}/picture` — envia ou troca a foto (multipart, campo `file`). Aceita PNG, JPEG e WEBP
+  de até 5 MB; o tipo é conferido pelos bytes do arquivo, não pela extensão (outros tipos → 415).
+- `DELETE /user/{id}/picture` — remove a foto; o GET passa a devolver a imagem padrão.
+
+O campo `picture` do usuário guarda só o nome do arquivo e é somente leitura: signup e
+`PUT /user/update` o ignoram.
+
+```sh
+curl -X PUT http://localhost:8090/user/1/picture \
+  -H "Authorization: Bearer $TOKEN" -F "file=@foto.jpg"
+```
+
 ## Testes 
 Tipos de testes incluídos/esperados:
 - Testes unitários (serviços, utilitários) com JUnit 5 + Mockito.

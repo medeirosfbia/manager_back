@@ -55,6 +55,8 @@ public class UserService {
             user.setPassword(criptPassword(user.getPassword()));
             // O papel não vem no JSON; mantém o que está no banco
             user.setRole(existingUser.get().getRole());
+            // A foto também não vem no JSON; só muda por /user/{id}/picture
+            user.setPicture(existingUser.get().getPicture());
 
             return Optional.ofNullable(userRepository.save(user));
 
