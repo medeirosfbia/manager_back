@@ -44,11 +44,17 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<User>>getUserById(@PathVariable Integer id){
+        if (!userService.canManage(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(userService.getById(id));
     }
 
     @PutMapping("/update")
     public  ResponseEntity<User> update(@Valid @RequestBody User user){
+            if (!userService.canManage(user.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
             return userService.update(user)
                     .map(updateUser -> ResponseEntity.status(HttpStatus.OK)
                             .body(updateUser))
@@ -63,6 +69,10 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id){
+        // Checado antes do 404 para não revelar quais ids existem
+        if (!userService.canManage(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

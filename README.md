@@ -104,6 +104,25 @@ POSTGRESPASSWORD=suasenha
 
 Você pode definir essas variáveis no ambiente do sistema ou em um arquivo `.env` (caso use ferramentas como Docker ou IDEs que suportam).
 
+#### Admin padrão
+
+Ao subir, a aplicação cria um usuário `ADMIN` se `ADMIN_PASSWORD` estiver definido:
+
+```
+ADMIN_USERNAME=admin              # opcional, padrão: admin
+ADMIN_EMAIL=admin@aprovia.com     # opcional, padrão: admin@aprovia.com
+ADMIN_PASSWORD=uma-senha-forte    # obrigatório para criar o admin
+```
+
+Se o username já existir, nada é alterado (um usuário comum chamado `admin` não vira admin).
+Para promover um usuário que já existe, rode no PostgreSQL:
+
+```sql
+UPDATE tb_user SET role = 'ADMIN' WHERE username = 'nome-do-usuario';
+```
+
+O papel vale no próximo login, porque é gravado no claim `role` do JWT.
+
 ### 3. Instalação das Dependências
 
 No terminal, execute:
@@ -137,7 +156,7 @@ Acesse [http://localhost:8090/swagger-ui.html](http://localhost:8090/swagger-ui.
 ## Como Funciona
 
 - **Autenticação:** Usuários se cadastram e fazem login. O login retorna um JWT, que deve ser enviado no header `Authorization` para acessar rotas protegidas.
-- **Usuários:** Podem ser criados, atualizados, deletados e ter o tipo alterado (USER/ADMIN).
+- **Usuários:** Podem ser criados, atualizados e deletados. Cada usuário tem um papel (`USER` ou `ADMIN`); o cadastro público sempre cria `USER` e o papel não pode ser alterado pelo `/user/update`. O login retorna o `role` e o grava no JWT.
 - **Segurança:** Todas as rotas (exceto login, cadastro e update de senha) exigem autenticação JWT.
 - **Documentação:** Swagger/OpenAPI gera documentação interativa dos endpoints.
 ---

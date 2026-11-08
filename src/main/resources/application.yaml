@@ -1,7 +1,4 @@
 spring:
-  rabbitmq:
-    addresses: amqps://voujkfip:75DMzZg-cbMwUd4rZqu_-J0pVfrtNJq_@shrimp.rmq.cloudamqp.com/voujkfip
-    queue: cylon
   jpa:
     generate-ddl: true
     database: postgresql
@@ -32,3 +29,10 @@ server:
 security:
   jwt:
     secret: ${JWT_SECRET_B64}
+
+# Admin criado pelo AdminSeeder na inicialização (só se ADMIN_PASSWORD estiver definido)
+admin:
+  default:
+    username: ${ADMIN_USERNAME:admin}
+    email: ${ADMIN_EMAIL:admin@aprovia.com}
+    password: ${ADMIN_PASSWORD:}
