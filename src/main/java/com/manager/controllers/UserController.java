@@ -3,6 +3,7 @@ package com.manager.controllers;
 import com.manager.models.User;
 import com.manager.models.UserLogin;
 import com.manager.repositories.UserRepository;
+import com.manager.services.ProfilePictureService;
 import com.manager.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ProfilePictureService profilePictureService;
 
     @PostMapping("/signup")
     public ResponseEntity<Optional<User>> post(@RequestBody User user){
@@ -78,6 +82,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         userRepository.deleteById(id);
+        profilePictureService.deleteStoredPicture(id, user.get().getPicture());
     }
 
 }

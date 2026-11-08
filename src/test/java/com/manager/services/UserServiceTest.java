@@ -136,6 +136,24 @@ public class UserServiceTest {
         assertEquals(Role.ADMIN, updated.get().getRole());
     }
 
+    @Test
+    void testUpdateKeepsPictureFromDatabase() {
+        User stored = new User();
+        stored.setId(1);
+        stored.setUsername("adminteste");
+        stored.setPicture("1-0123456789abcdef0123456789abcdef.png");
+
+        // Simula o JSON recebido: picture é ignorado e chega null
+        user.setPicture(null);
+        when(userRepository.findById(1)).thenReturn(Optional.of(stored));
+        when(userRepository.findByUsername("adminteste")).thenReturn(Optional.of(stored));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Optional<User> updated = userService.update(user);
+
+        assertEquals("1-0123456789abcdef0123456789abcdef.png", updated.get().getPicture());
+    }
+
     // ----------------------- UPDATE PASSWORD -------------------------------
 
     @Test

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+podman start aprovia-postgres ollama
+
 set -a
 source .env
 set +a
